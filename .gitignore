@@ -1,0 +1,14 @@
+# Go build artifacts
+*.test
+*.out
+/bin/
+
+# Editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Temp scratch for commit / PR bodies
+.tmp-commit-msg
+.tmp-pr-body.md
