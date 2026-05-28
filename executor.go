@@ -3,6 +3,7 @@ package studio
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -418,11 +419,7 @@ func buildRoleViews(b Blueprint) []executorRoleView {
 	for r := range b.Roles {
 		roleNames = append(roleNames, r)
 	}
-	for i := 1; i < len(roleNames); i++ {
-		for j := i; j > 0 && roleNames[j] < roleNames[j-1]; j-- {
-			roleNames[j], roleNames[j-1] = roleNames[j-1], roleNames[j]
-		}
-	}
+	sort.Strings(roleNames)
 	out := make([]executorRoleView, 0, len(roleNames))
 	for _, r := range roleNames {
 		view := executorRoleView{NameQuoted: fmt.Sprintf("%q", r)}

@@ -2,6 +2,7 @@ package studio
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -88,93 +89,12 @@ func BuildConstants(b Blueprint, packageName string) ([]byte, error) {
 	return []byte(sb.String()), nil
 }
 
-// stripHyphens is the small helper that turns "refund-flow" into
-// "refundflow" for the adapter name. Adapter names per the
-// conventions are single-word lowercase; we strip hyphens rather
-// than refusing hyphenated domain names, because the YAML's
-// `domain` field accepts hyphens.
-func stripHyphens(s string) string {
-	out := make([]byte, 0, len(s))
-	for i := 0; i < len(s); i++ {
-		if s[i] == '-' {
-			continue
-		}
-		out = append(out, s[i])
-	}
-	return string(out)
-}
-
-// goExportName turns a hyphenated lowercase string into
-// PascalCase: "refund-flow" -> "RefundFlow". Used to derive Go
-// identifier names from domain-level names.
-func goExportName(s string) string {
-	out := make([]byte, 0, len(s))
-	upper := true
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c == '-' || c == '_' {
-			upper = true
-			continue
-		}
-		if upper && c >= 'a' && c <= 'z' {
-			out = append(out, c-('a'-'A'))
-		} else {
-			out = append(out, c)
-		}
-		upper = false
-	}
-	return string(out)
-}
-
-// goExportFromUpperSnake turns "ORDER_READY_FOR_REFUND" into
-// "OrderReadyForRefund". Used to derive Go const names from
-// UPPER_SNAKE_CASE event/state/action names.
-func goExportFromUpperSnake(s string) string {
-	out := make([]byte, 0, len(s))
-	upper := true
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c == '_' {
-			upper = true
-			continue
-		}
-		if upper {
-			// Already uppercase in UPPER_SNAKE_CASE.
-			out = append(out, c)
-			upper = false
-			continue
-		}
-		// Convert subsequent letters to lowercase.
-		if c >= 'A' && c <= 'Z' {
-			out = append(out, c+('a'-'A'))
-		} else {
-			out = append(out, c)
-		}
-	}
-	return string(out)
-}
-
-// goExportFromPerm turns "refund-flow.issue_refund.approve" into
-// "RefundFlowIssueRefundApprove". Used to derive Go const names
-// from dotted.lowercase permission strings.
-func goExportFromPerm(s string) string {
-	out := make([]byte, 0, len(s))
-	upper := true
-	for i := 0; i < len(s); i++ {
-		c := s[i]
-		if c == '-' || c == '_' || c == '.' {
-			upper = true
-			continue
-		}
-		if upper && c >= 'a' && c <= 'z' {
-			out = append(out, c-('a'-'A'))
-		} else {
-			out = append(out, c)
-		}
-		upper = false
-	}
-	return string(out)
-}
+// stripHyphens, goExportName, goExportFromUpperSnake,
+// goExportFromPerm, and isGoIdent are defined in naming.go
+// alongside the other convention helpers (the predicate
+// functions like isUpperSnake / isDottedLower). Keeping all
+// naming-shaped helpers in one file makes them easy to find from
+// any caller.
 
 // uniqueSortedPermissions returns every permission referenced by
 // the Blueprint's actions (including .approve counterparts) plus
@@ -195,36 +115,6 @@ func uniqueSortedPermissions(b Blueprint) []string {
 	for p := range seen {
 		out = append(out, p)
 	}
-	for i := 1; i < len(out); i++ {
-		for j := i; j > 0 && out[j] < out[j-1]; j-- {
-			out[j], out[j-1] = out[j-1], out[j]
-		}
-	}
+	sort.Strings(out)
 	return out
-}
-
-// isGoIdent reports whether s is a valid Go identifier:
-// non-empty, starts with a letter or underscore, contains only
-// letters, digits, and underscores. Used to validate user-provided
-// package names before inserting them into generated source.
-func isGoIdent(s string) bool {
-	if s == "" {
-		return false
-	}
-	c := s[0]
-	if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
-		return false
-	}
-	for i := 1; i < len(s); i++ {
-		c := s[i]
-		switch {
-		case c >= 'a' && c <= 'z':
-		case c >= 'A' && c <= 'Z':
-		case c >= '0' && c <= '9':
-		case c == '_':
-		default:
-			return false
-		}
-	}
-	return true
 }

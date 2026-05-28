@@ -2,6 +2,7 @@ package studio
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -98,11 +99,6 @@ func sortedKeys(m map[string][]string) []string {
 	for k := range m {
 		out = append(out, k)
 	}
-	// Insertion sort: maps are small, the simpler code wins.
-	for i := 1; i < len(out); i++ {
-		for j := i; j > 0 && out[j] < out[j-1]; j-- {
-			out[j], out[j-1] = out[j-1], out[j]
-		}
-	}
+	sort.Strings(out)
 	return out
 }

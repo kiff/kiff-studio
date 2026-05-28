@@ -3,6 +3,7 @@ package studio
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 	"text/template"
 )
@@ -107,12 +108,7 @@ func buildTestData(b Blueprint, pkg string) testData {
 		for r := range b.Roles {
 			roles = append(roles, r)
 		}
-		// Insertion sort.
-		for i := 1; i < len(roles); i++ {
-			for j := i; j > 0 && roles[j] < roles[j-1]; j-- {
-				roles[j], roles[j-1] = roles[j-1], roles[j]
-			}
-		}
+		sort.Strings(roles)
 		d.RoleNameQuoted = fmt.Sprintf("%q", roles[0])
 	} else {
 		d.RoleNameQuoted = `"tenant_owner"`

@@ -163,3 +163,116 @@ func camelToSnake(s string) string {
 	}
 	return string(out)
 }
+
+// stripHyphens turns "refund-flow" into "refundflow". Used to
+// derive the adapter name from the domain — adapter names per the
+// framework's conventions are single-word lowercase, while the
+// YAML's domain field accepts hyphens.
+func stripHyphens(s string) string {
+	out := make([]byte, 0, len(s))
+	for i := 0; i < len(s); i++ {
+		if s[i] == '-' {
+			continue
+		}
+		out = append(out, s[i])
+	}
+	return string(out)
+}
+
+// goExportName turns a hyphenated lowercase string into
+// PascalCase: "refund-flow" -> "RefundFlow". Used to derive Go
+// identifier names from domain-level names.
+func goExportName(s string) string {
+	out := make([]byte, 0, len(s))
+	upper := true
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '-' || c == '_' {
+			upper = true
+			continue
+		}
+		if upper && c >= 'a' && c <= 'z' {
+			out = append(out, c-('a'-'A'))
+		} else {
+			out = append(out, c)
+		}
+		upper = false
+	}
+	return string(out)
+}
+
+// goExportFromUpperSnake turns "ORDER_READY_FOR_REFUND" into
+// "OrderReadyForRefund". Used to derive Go const names from
+// UPPER_SNAKE_CASE event/state/action names.
+func goExportFromUpperSnake(s string) string {
+	out := make([]byte, 0, len(s))
+	upper := true
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '_' {
+			upper = true
+			continue
+		}
+		if upper {
+			// Already uppercase in UPPER_SNAKE_CASE.
+			out = append(out, c)
+			upper = false
+			continue
+		}
+		// Convert subsequent letters to lowercase.
+		if c >= 'A' && c <= 'Z' {
+			out = append(out, c+('a'-'A'))
+		} else {
+			out = append(out, c)
+		}
+	}
+	return string(out)
+}
+
+// goExportFromPerm turns "refund-flow.issue_refund.approve" into
+// "RefundFlowIssueRefundApprove". Used to derive Go const names
+// from dotted.lowercase permission strings.
+func goExportFromPerm(s string) string {
+	out := make([]byte, 0, len(s))
+	upper := true
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if c == '-' || c == '_' || c == '.' {
+			upper = true
+			continue
+		}
+		if upper && c >= 'a' && c <= 'z' {
+			out = append(out, c-('a'-'A'))
+		} else {
+			out = append(out, c)
+		}
+		upper = false
+	}
+	return string(out)
+}
+
+// isGoIdent reports whether s is a valid Go identifier:
+// non-empty, starts with a letter or underscore, contains only
+// letters, digits, and underscores. Used to validate user-provided
+// package names before inserting them into generated source.
+func isGoIdent(s string) bool {
+	if s == "" {
+		return false
+	}
+	c := s[0]
+	if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
+		return false
+	}
+	for i := 1; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case c >= 'a' && c <= 'z':
+		case c >= 'A' && c <= 'Z':
+		case c >= '0' && c <= '9':
+		case c == '_':
+		default:
+			return false
+		}
+	}
+	return true
+}
