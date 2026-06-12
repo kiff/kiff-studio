@@ -43,7 +43,7 @@ func BuildConstants(b Blueprint, packageName string) ([]byte, error) {
 	sb.WriteString(packageName)
 	sb.WriteString("\n\n")
 
-	sb.WriteString(`import "github.com/kiffhq/kiff/pkg/kiff/permission"`)
+	sb.WriteString(`import "github.com/kiff/kiff/pkg/kiff/permission"`)
 	sb.WriteString("\n\n")
 
 	sb.WriteString("const (\n")

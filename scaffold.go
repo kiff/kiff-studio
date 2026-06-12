@@ -100,7 +100,7 @@ const goModTemplate = `module {{.ModulePath}}
 
 go 1.23.0
 
-require github.com/kiffhq/kiff v0.1.0
+require github.com/kiff/kiff v0.1.0
 `
 
 func renderGoMod(modulePath string) ([]byte, error) {
@@ -131,7 +131,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/kiffhq/kiff/pkg/kiff/httpapi"
+	"github.com/kiff/kiff/pkg/kiff/httpapi"
 
 	"{{.ModulePath}}/internal/domain"
 )
