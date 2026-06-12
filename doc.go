@@ -1,7 +1,7 @@
 // Package studio is the KIFF authoring layer.
 //
 // See README.md for an overview. The full design is in RFC 012:
-// https://github.com/kiffhq/kiff-cloud/blob/main/docs/design/012-studio-mvp.md
+// https://github.com/kiff/kiff-cloud/blob/main/docs/design/012-studio-mvp.md
 //
 // The package's primary entry point is GenerateBlueprint, which
 // validates the caller's Input, dispatches it to the right

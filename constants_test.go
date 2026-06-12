@@ -13,7 +13,7 @@ const canonicalRefundConstants = `// Package domain holds the refund-flow domain
 // place, per the framework's conventions.
 package domain
 
-import "github.com/kiffhq/kiff/pkg/kiff/permission"
+import "github.com/kiff/kiff/pkg/kiff/permission"
 
 const (
 	AdapterRefundFlow = "refundflow"

@@ -44,7 +44,7 @@ func TestBuildScaffold_GoModCarriesModulePath(t *testing.T) {
 	if !strings.Contains(out, "module github.com/acme/orders") {
 		t.Fatalf("go.mod missing module path:\n%s", out)
 	}
-	if !strings.Contains(out, "github.com/kiffhq/kiff v0.1.0") {
+	if !strings.Contains(out, "github.com/kiff/kiff v0.1.0") {
 		t.Fatalf("go.mod missing framework dep:\n%s", out)
 	}
 }
