@@ -37,8 +37,11 @@ consumer needs them.
 
 ## Quick start
 
+This is the deterministic path, `BuilderInput`. It's the one that works
+out of the box in v0.1, with no model client:
+
 ```go
-import "github.com/kiffhq/kiff-studio"
+import "github.com/kiff/kiff-studio"
 
 input := studio.BuilderInput{
     WorkflowName: "refund-flow",
@@ -74,16 +77,18 @@ input shapes:
 
 | Input | Path | Notes |
 |---|---|---|
-| `BuilderInput` | deterministic | structured form, no LLM |
-| `DescriptionInput` | LLM-assisted | plain-English → blueprint |
-| `URLInput` | LLM-assisted | URL → blueprint |
-| `ExistingCodeInput` | LLM-assisted | code snippet → blueprint |
+| `BuilderInput` | deterministic | structured form, no LLM. **Works in v0.1.** |
+| `DescriptionInput` | LLM-assisted | plain-English → blueprint. Needs your `LLMGenerator`. |
+| `URLInput` | LLM-assisted | URL → blueprint. Needs your `LLMGenerator`. |
+| `ExistingCodeInput` | LLM-assisted | code snippet → blueprint. Needs your `LLMGenerator`. |
 
 The deterministic path has zero non-stdlib non-framework dependencies.
-The LLM-assisted shapes require an `LLMGenerator` wired through
-`WithLLMGenerator(...)`; v0.1 ships the interface only — the
-consumer (Cloud's wrapper, framework-only adopters) provides the
-concrete implementation. Tests use a stub.
+
+**v0.1 ships no model client.** The three LLM-assisted shapes are an
+interface only: they work once you pass your own implementation of
+`LLMGenerator` with `WithLLMGenerator(...)`. Without one,
+`GenerateBlueprint` returns `ErrLLMGeneratorRequired`. Description,
+URL or code to a domain doesn't work out of the box. Tests use a stub.
 
 ## The artifact builders
 
